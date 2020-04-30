@@ -1,7 +1,7 @@
-import dimscord, strutils, tables, asyncdispatch, json
+import dimscord, strutils, tables, asyncdispatch, json, strformat
 
 type
-    Context = object
+    Context* = object
         message*: Message
         member*:Member
         author*:User
@@ -13,12 +13,12 @@ type
         cache*:CacheTable
         client*:DiscordClient
         
-    Command = object
+    Command* = object
         name*: string
         execute*: proc(ctx: Context)
         autorun*: proc(client: DiscordClient)
         
-    Extensions = object
+    Extensions* = object
         commands*: Table[string, Command]
         prefix*:string
         client*: DiscordClient
@@ -67,7 +67,13 @@ proc getMember*(guild:Guild, m:string):Member=
     for member in guild.members.values:
         if member.nick == m or m in member.nick or member.user.username == m or m in member.user.username:
             result = member
-            
+
+proc mention*(m: Member):string =
+    return fmt"<@{m.user.id}>" #DOES NOT WORK
+    
+proc mention*(m: GuildChannel):string =
+    return fmt"<#{m.id}>"
+     
 proc newExtensionManager*(client:DiscordClient, prefix:string = "."):Extensions =
     result.commands = initTable[string, Command]()
     result.prefix = prefix
@@ -89,8 +95,11 @@ proc processCommands*(ext: Extensions, message:Message) =
 proc send*(ctx:Context, content:string) =
     discard waitFor ctx.client.api.sendMessage(ctx.channel.id, content)
     
-proc send*(ctx:Context, channel:GuildChannel, content:string) =
+proc send*(channel:GuildChannel, ctx:Context, content:string) =
     discard waitFor ctx.client.api.sendMessage(channel.id, content)
+
+proc reply*(ctx:Context, content:string) =
+    discard waitFor ctx.client.api.sendMessage(ctx.channel.id, fmt"{ctx.member.mention()}, {content}")
     
 proc defaultCommands*(e: var Extensions) =
     var command_echo = e.registerCommand("echo", proc(ctx:Context) =
