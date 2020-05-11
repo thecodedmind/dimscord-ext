@@ -18,23 +18,23 @@ library updates, but thats life.
 ~Kaiser
 
 ## TODO
- [ ] Help system
- [ ] Inline Permission checks for commands
- [ ] Background processes
- [ ] Other stuff (undecided)
+ [ ] Help system<br>
+ [ ] Inline Permission checks for commands<br>
+ [ ] Background processes<br>
+ [ ] Other stuff (undecided)<br>
  
 ## Utilities
 
-ctx.getGuild(name_or_id)
-ctx.getChannel(^)
-ctx.getUser(^)
-ctx.getMember(^)
-ctx.send(message)
-channel.send(ctx, ^)
-ctx.reply(^) - Does not currently work, unsure why
-member.mention() -> returns a string representation of a member, see above.
-channel.mention() -> ^ for a channel
-ext.registerCommand(name, proc(ctx))
+ctx.getGuild(name_or_id)<br>
+ctx.getChannel(^)<br>
+ctx.getUser(^)<br>
+ctx.getMember(^)<br>
+ctx.send(message)<br>
+channel.send(ctx, ^)<br>
+ctx.reply(^) - Does not currently work, unsure why<br>
+member.mention() -> returns a string representation of a member, see above.<br>
+channel.mention() -> ^ for a channel<br>
+ext.registerCommand(name, proc(ctx))<br>
 
 ```nim
 import dimscord, asyncdispatch, os, ext, json

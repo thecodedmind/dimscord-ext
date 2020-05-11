@@ -69,6 +69,10 @@ proc getMember*(guild:Guild, m:string):Member=
             result = member
 
 proc mention*(m: Member):string =
+    if m == nil:
+        return "UNDEFINED"
+    if m.user == nil:
+        return m.nick:
     return fmt"<@{m.user.id}>" #DOES NOT WORK
     
 proc mention*(m: GuildChannel):string =
@@ -102,6 +106,6 @@ proc reply*(ctx:Context, content:string) =
     discard waitFor ctx.client.api.sendMessage(ctx.channel.id, fmt"{ctx.member.mention()}, {content}")
     
 proc defaultCommands*(e: var Extensions) =
-    var command_echo = e.registerCommand("echo", proc(ctx:Context) =
+    discard e.registerCommand("echo", proc(ctx:Context) =
                                   ctx.send(ctx.argsRaw)
     )
