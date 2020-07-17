@@ -56,18 +56,18 @@ extm.defaultCommands() # Loads the default command set
 # if the user ran `.echo this is a test` 
 # ctx.args is ["this", "is", "a", "test"] sequence
 # whereas ctx.argsRaw is "this is a test" string
-discard extm.registerCommand("say", proc(ctx:Context) =
-ctx.send(ctx.argsRaw) 
+discard extm.registerCommand("say", proc(ctx:Context) {.async.} =
+await ctx.send(ctx.argsRaw) 
 )
 	
-extm.registerCommand("say-admin", proc(ctx:Context) =
+extm.registerCommand("say-admin", proc(ctx:Context) {.async.} =
 # TCM: ctx also adds get* methods, to quickly grab an object from cache
 # works based on either ID, or string name
 # included is `getChannel`, `getGuild`, `getMember`, `getUser`
 let c = ctx.getChannel("admin-room")
 # Passing a channel object to paramater one of send, sends the message to that channel instead of the
-# executing channel
-ctx.send(c, ctx.argsRaw) 
+# executing channel. c.send(ctx, text) also works. OPTIONS!
+await ctx.send(c, ctx.argsRaw) 
 )	
 		
 cl.events.on_ready = proc (s: Shard, r: Ready) = # Add Event Handler for on_ready.
