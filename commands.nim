@@ -1,11 +1,16 @@
-import ext, dimscord
+import ext, dimscord, asyncdispatch, strformat
 
 proc loadCommands*(e:var Extensions) =
-    discard e.registerCommand("say-ath", proc(ctx:Context) =
+    e.registerCommand("say-ath", proc(ext: Extensions, ctx:Context) {.async.} =
                                                 let c = ctx.getChannel("athena")
-                                                c.send(ctx, ctx.argsRaw)
+                                                await c.send(ctx, ctx.argsRaw)
     )
 
-    discard e.registerCommand("reply", proc(ctx:Context) =
-                                                ctx.reply("You got it boss..")
+    e.registerCommand("reply", proc(ext: Extensions, ctx:Context) {.async.} =
+                                                await ctx.reply(fmt"You got it boss..")
+                                                await ctx.send(fmt"You got it {ctx.member.user.id}")
+    )
+    
+    e.registerCommand("channel", proc(ext: Extensions, ctx:Context) {.async.} =
+                                                await ctx.send(ctx.channel.mention())
     )
