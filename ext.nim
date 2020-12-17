@@ -1,4 +1,4 @@
-import dimscord, strutils, tables, asyncdispatch, json, strformat, options
+import dimscord, strutils, tables, asyncdispatch, json, strformat, options, os
 
 type
     Context* = object
@@ -13,7 +13,7 @@ type
         cache*:CacheTable
         client*:DiscordClient
         shard*:Shard
-        
+
     Command* = object
         name*, brief*, help*, usage*: string
         execute*: proc(e: Extensions, ctx: Context) {.async.}
@@ -24,6 +24,21 @@ type
         prefix*: string
         client*: DiscordClient
 
+proc newEmbed*(): Embed = return Embed()
+proc setTitle*(e: var Embed, title: string) = e.title = some title
+proc setTimestamp*(e: var Embed, title: string) = e.timestamp = some title
+proc setUrl*(e: var Embed, title: string) = e.url = some title
+proc setDescription*(e: var Embed, title: string) = e.description = some title
+proc setColour*(e: var Embed, colour: int) =  e.color = some colour
+proc setColor*(e: var Embed, color: int) =  e.setColour(color)
+  
+proc addField*(e: var Embed, name, value: string) =
+    if e.fields.isSome:
+        e.fields.get().add(EmbedField(name: name, value: value))
+    else:
+        e.fields = some newSeq[EmbedField]()
+        e.fields.get().add(EmbedField(name: name, value: value))
+        
 proc newContext*(m:Message, e:Extensions, s:Shard):Context =
     result.cache = s.cache
     result.message = m
@@ -39,6 +54,7 @@ proc newContext*(m:Message, e:Extensions, s:Shard):Context =
     result.args = parts[1..(parts.len()-1)]
     result.argsRaw = result.args.join(" ")
     result.client = e.client
+
     
 proc getGuild*(ctx:Context, guildName:string):Guild=
     if ctx.cache.guilds.hasKey(guildName):
@@ -89,13 +105,13 @@ proc registerCommand*(ext:var Extensions, name:string, fn:proc) =
     c.execute = fn
     ext.commands[name] = c
     
-proc setBrief(ext: var Extensions, c, b:string) =
+proc setBrief*(ext: var Extensions, c, b:string) =
     ext.commands[c].brief = b
 
-proc setHelp(ext: var Extensions, c, b:string) =
+proc setHelp*(ext: var Extensions, c, b:string) =
     ext.commands[c].help = b
     
-proc setUsage(ext: var Extensions, c, b:string) =
+proc setUsage*(ext: var Extensions, c, b:string) =
     ext.commands[c].usage = b
         
 proc processCommands*(ext: Extensions, message:Message, shard:Shard) {.async.} =
@@ -112,6 +128,8 @@ proc send*(ctx:Context, content:string) {.async.} =
 proc send*(channel:GuildChannel, ctx:Context, content:string) {.async.} =
     discard await ctx.client.api.sendMessage(channel.id, content)
 
+proc send*(ctx:Context, em:Embed) {.async.} =
+    discard await ctx.client.api.sendMessage(ctx.channel.id, embed = some em)
 proc reply*(ctx:Context, content:string) {.async.} =
     discard await ctx.client.api.sendMessage(ctx.channel.id, fmt"{ctx.author.mention()}, {content}")
     
@@ -133,7 +151,7 @@ proc defaultCommands*(e: var Extensions) =
                 await ctx.reply(outp)
             else:
                 if ext.commands.hasKey(ctx.argsRaw):
-                    await ctx.reply("```\n"&ext.prefix&ctx.argsRaw&" "&ext.commands[ctx.argsRaw].usage&"\n"&ext.commands[ctx.argsRaw].brief&"\n"&ext.commands[ctx.argsRaw].help&"```")
+                    await ctx.reply("```\n"&ext.prefix&ctx.argsRaw&" "&ext.commands[ctx.argsRaw].usage&"\n"&ext.commands[ctx.argsRaw].brief&"\n"&ext.commands[ctx.argsRaw].help&"\n```")
                 else:
                     await ctx.reply("Command not found.")
                     

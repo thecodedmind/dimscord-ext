@@ -1,4 +1,4 @@
-import ext, dimscord, asyncdispatch, strformat
+import "../ext", dimscord, asyncdispatch, strformat
 
 proc loadCommands*(e:var Extensions) =
     e.registerCommand("say-ath", proc(ext: Extensions, ctx:Context) {.async.} =
@@ -6,9 +6,9 @@ proc loadCommands*(e:var Extensions) =
                                                 await c.send(ctx, ctx.argsRaw)
     )
 
-    e.registerCommand("reply", proc(ext: Extensions, ctx:Context) {.async.} =
-                                                await ctx.reply(fmt"You got it boss..")
-                                                await ctx.send(fmt"You got it {ctx.member.user.id}")
+    e.registerCommand("inviteme", proc(ext: Extensions, ctx:Context) {.async.} =
+             await ctx.reply(fmt"https://discordapp.com/oauth2/authorize?client_id=699655328991674448&scope=bot")
+                                             
     )
     
     e.registerCommand("channel", proc(ext: Extensions, ctx:Context) {.async.} =
